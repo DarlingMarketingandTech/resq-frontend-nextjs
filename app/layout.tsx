@@ -6,8 +6,9 @@ import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "RESQ Headless WooCommerce Storefront",
-  description: "Production-ready Next.js 16 + WooCommerce + WPGraphQL starter storefront.",
+  title: "ResQ Organics — Therapeutic Skincare for Humans & Pets",
+  description:
+    "Premium natural skincare powered by Medical-Grade Manuka Honey, Organic Aloe Vera, and Full-Spectrum CBD. Healing for the whole family.",
 };
 
 export default function RootLayout({
@@ -17,9 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="flex min-h-full flex-col bg-slate-50 text-slate-900">
+      <body className="flex min-h-full flex-col bg-brand-cream text-brand-text">
         <SiteHeader />
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:px-8">{children}</main>
+        <main className="flex-1">{children}</main>
         <SiteFooter />
       </body>
     </html>

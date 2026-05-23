@@ -3,22 +3,42 @@ import type { Product } from "@/types/product";
 
 type ProductGridProps = {
   products: Product[];
+  title?: string;
+  subtitle?: string;
 };
 
-export function ProductGrid({ products }: ProductGridProps) {
+export function ProductGrid({ products, title, subtitle }: ProductGridProps) {
   if (!products.length) {
     return (
-      <p className="rounded-md border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">
-        No products are available. Set WP_GRAPHQL_URL and confirm your WooCommerce WPGraphQL endpoint is online.
-      </p>
+      <div className="rounded-2xl border border-dashed border-brand-border bg-white p-10 text-center">
+        <p className="text-sm text-brand-muted">
+          No products available at this time.
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
-      ))}
-    </div>
+    <section>
+      {(title || subtitle) && (
+        <div className="mb-10 text-center">
+          {title && (
+            <h2 className="text-2xl font-bold tracking-tight text-brand-dark sm:text-3xl">
+              {title}
+            </h2>
+          )}
+          {subtitle && (
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-brand-muted sm:text-base">
+              {subtitle}
+            </p>
+          )}
+        </div>
+      )}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    </section>
   );
 }
