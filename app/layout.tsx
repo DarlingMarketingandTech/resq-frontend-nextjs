@@ -1,26 +1,30 @@
 import type { Metadata } from "next";
-
+import Header from "@/components/layout/Header";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ResQ Organics — Therapeutic Skincare for Humans & Pets",
-  description:
-    "Premium natural skincare powered by Medical-Grade Manuka Honey, Organic Aloe Vera, and Full-Spectrum CBD. Healing for the whole family.",
+  title: "ResQ Organics | Natural Healing Skincare",
+  description: "Premium Manuka Honey and holistic wellness solutions.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="flex min-h-full flex-col bg-brand-cream text-brand-text">
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
+    <html lang="en">
+      <body className="bg-[#FAFAFA] text-[#1A1A18] antialiased flex flex-col min-h-screen">
+        {/* The global sticky header sits permanently at the top */}
+        <Header />
+        
+        {/* Main layout container pushes down so content isn't hidden under fixed header */}
+        <main className="flex-1 pt-24">
+          {children}
+        </main>
+        
+        {/* Preserved the existing footer */}
         <SiteFooter />
       </body>
     </html>
