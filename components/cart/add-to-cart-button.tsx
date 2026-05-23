@@ -1,6 +1,6 @@
 "use client";
 
-import { useCartStore } from "@/lib/cart-store";
+import { useCartStore } from "@/store/useCartStore";
 import type { Product } from "@/types/product";
 
 type AddToCartButtonProps = {
@@ -9,12 +9,23 @@ type AddToCartButtonProps = {
 
 export function AddToCartButton({ product }: AddToCartButtonProps) {
   const addItem = useCartStore((state) => state.addItem);
+  const openCart = useCartStore((state) => state.openCart);
+
+  const handleAddToCart = () => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price ?? '',
+      image: product.image?.sourceUrl ?? '',
+    });
+    openCart();
+  };
 
   return (
     <button
       type="button"
-      onClick={() => addItem(product)}
-      className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+      onClick={handleAddToCart}
+      className="rounded-md bg-brand-forest px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-forest-dark"
     >
       Add to Cart
     </button>

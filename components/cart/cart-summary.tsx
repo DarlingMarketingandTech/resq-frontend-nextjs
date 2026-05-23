@@ -1,9 +1,13 @@
 "use client";
 
-import { useCartStore } from "@/lib/cart-store";
+import { useCartStore } from "@/store/useCartStore";
 
 export function CartSummary() {
   const totalItems = useCartStore((state) => state.totalItems());
 
-  return <span className="rounded-full bg-slate-900 px-3 py-1 text-xs text-white">Cart ({totalItems})</span>;
+  return (
+    <span className="rounded-full bg-brand-forest px-3 py-1 text-xs font-semibold text-white">
+      Cart ({totalItems})
+    </span>
+  );
 }

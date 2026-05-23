@@ -1,14 +1,3 @@
-import type { Product } from "@/types/product";
-
-export interface CartItem {
-  product: Product;
-  quantity: number;
-}
-
-export interface CartState {
-  items: CartItem[];
-  addItem: (product: Product) => void;
-  removeItem: (productId: string) => void;
-  clearCart: () => void;
-  totalItems: () => number;
-}
+// CartItem and CartStore are now exported from @/store/useCartStore
+// This file is kept for backward compatibility
+export { type CartItem, type CartStore as CartState } from '@/store/useCartStore';

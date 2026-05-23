@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useCartStore } from "@/store/useCartStore";
 
 type MenuItem = {
   label: string;
@@ -168,6 +169,8 @@ export default function Header() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [openMobileDropdowns, setOpenMobileDropdowns] = useState<string[]>([]);
+  const cartCount = useCartStore((state) => state.totalItems());
+  const openCart = useCartStore((state) => state.openCart);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -348,16 +351,34 @@ export default function Header() {
               <button aria-label="Search" className="text-stone-600 hover:text-stone-900 transition-colors">
                 <SearchIcon className="w-5 h-5" />
               </button>
-              <button aria-label="Cart" className="text-stone-600 hover:text-stone-900 transition-colors">
+              <button
+                onClick={openCart}
+                aria-label="Cart"
+                className="relative text-stone-600 hover:text-stone-900 transition-colors"
+              >
                 <CartIcon className="w-5 h-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-brand-forest rounded-full">
+                    {cartCount}
+                  </span>
+                )}
               </button>
             </div>
           </nav>
 
           {/* Mobile Utility Icons */}
           <div className="flex items-center lg:hidden space-x-4">
-            <button aria-label="Cart" className="text-stone-600 hover:text-stone-900">
+            <button
+              onClick={openCart}
+              aria-label="Cart"
+              className="relative text-stone-600 hover:text-stone-900"
+            >
               <CartIcon className="w-6 h-6" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-brand-forest rounded-full">
+                  {cartCount}
+                </span>
+              )}
             </button>
           </div>
         </div>

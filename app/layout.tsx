@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Header from "@/components/layout/Header";
 import { SiteFooter } from "@/components/site-footer";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,12 +19,15 @@ export default function RootLayout({
       <body className="bg-[#FAFAFA] text-[#1A1A18] antialiased flex flex-col min-h-screen">
         {/* The global sticky header sits permanently at the top */}
         <Header />
-        
+
         {/* Main layout container pushes down so content isn't hidden under fixed header */}
         <main className="flex-1 pt-24">
           {children}
         </main>
-        
+
+        {/* Cart Drawer - accessible from anywhere */}
+        <CartDrawer />
+
         {/* Preserved the existing footer */}
         <SiteFooter />
       </body>

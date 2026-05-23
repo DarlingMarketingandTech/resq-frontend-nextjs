@@ -28,12 +28,24 @@ const PRODUCTS_QUERY = /* GraphQL */ `
         name
         shortDescription
         description
-        price
-        regularPrice
-        salePrice
         image {
           sourceUrl
           altText
+        }
+        ... on SimpleProduct {
+          price
+          regularPrice
+          salePrice
+        }
+        ... on VariableProduct {
+          price
+          regularPrice
+          salePrice
+        }
+        ... on ExternalProduct {
+          price
+          regularPrice
+          salePrice
         }
       }
     }
@@ -49,12 +61,24 @@ const PRODUCT_BY_SLUG_QUERY = /* GraphQL */ `
         name
         shortDescription
         description
-        price
-        regularPrice
-        salePrice
         image {
           sourceUrl
           altText
+        }
+        ... on SimpleProduct {
+          price
+          regularPrice
+          salePrice
+        }
+        ... on VariableProduct {
+          price
+          regularPrice
+          salePrice
+        }
+        ... on ExternalProduct {
+          price
+          regularPrice
+          salePrice
         }
       }
     }
