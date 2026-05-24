@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { toast } from 'sonner';
 
 export interface CartItem {
   id: string;
@@ -21,6 +22,9 @@ export interface CartStore {
   isCartOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
+  cartToken: string | null;
+  setCartToken: (token: string) => void;
+  syncToWC: (item: Omit<CartItem, 'quantity'>) => Promise<void>;
   // Ref-counted scroll lock so concurrent overlays don't race each other.
   _scrollLockCount: number;
   lockScroll: () => void;
@@ -43,6 +47,7 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       isCartOpen: false,
+      cartToken: null,
       _scrollLockCount: 0,
 
       addItem: (item) =>
@@ -77,6 +82,8 @@ export const useCartStore = create<CartStore>()(
       openCart: () => set({ isCartOpen: true }),
       closeCart: () => set({ isCartOpen: false }),
 
+      setCartToken: (token) => set({ cartToken: token }),
+
       lockScroll: () =>
         set((state) => {
           const next = state._scrollLockCount + 1;
@@ -90,6 +97,39 @@ export const useCartStore = create<CartStore>()(
           applyScrollLock(next);
           return { _scrollLockCount: next };
         }),
+
+      syncToWC: async (item) => {
+        const currentToken = get().cartToken;
+
+        try {
+          const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+          };
+          if (currentToken) {
+            headers['X-Cart-Token'] = currentToken;
+          }
+
+          const res = await fetch('/api/cart/add', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ id: Number(item.id), quantity: 1 }),
+          });
+
+          if (!res.ok) {
+            get().removeItem(item.id);
+            toast.error('Failed to add item. Please try again.');
+            return;
+          }
+
+          const data = await res.json();
+          if (data.cartToken) {
+            set({ cartToken: data.cartToken });
+          }
+        } catch {
+          get().removeItem(item.id);
+          toast.error('Failed to add item. Please try again.');
+        }
+      },
     }),
     {
       name: 'resq-cart-storage',
@@ -97,6 +137,7 @@ export const useCartStore = create<CartStore>()(
       partialize: (state) => ({
         items: state.items,
         isCartOpen: state.isCartOpen,
+        cartToken: state.cartToken,
       }),
     }
   )

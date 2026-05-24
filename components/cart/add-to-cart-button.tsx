@@ -10,15 +10,18 @@ type AddToCartButtonProps = {
 export function AddToCartButton({ product }: AddToCartButtonProps) {
   const addItem = useCartStore((state) => state.addItem);
   const openCart = useCartStore((state) => state.openCart);
+  const syncToWC = useCartStore((state) => state.syncToWC);
 
   const handleAddToCart = () => {
-    addItem({
+    const cartItem = {
       id: product.id,
       name: product.name,
       price: product.price ?? '',
       image: product.image?.sourceUrl ?? '',
-    });
+    };
+    addItem(cartItem);
     openCart();
+    syncToWC(cartItem);
   };
 
   return (

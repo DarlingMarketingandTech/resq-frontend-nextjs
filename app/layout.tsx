@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Header from "@/components/layout/Header";
 import { SiteFooter } from "@/components/site-footer";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,6 +31,9 @@ export default function RootLayout({
 
         {/* Preserved the existing footer */}
         <SiteFooter />
+
+        {/* Toast notifications for user feedback */}
+        <Toaster position="bottom-right" richColors />
       </body>
     </html>
   );
