@@ -45,23 +45,26 @@ export function CartDrawer() {
   const items = useCartStore((state) => state.items);
   const removeItem = useCartStore((state) => state.removeItem);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
+  const lockScroll = useCartStore((state) => state.lockScroll);
+  const unlockScroll = useCartStore((state) => state.unlockScroll);
 
   const subtotal = items.reduce((sum, item) => {
     const price = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
     return sum + price * item.quantity;
   }, 0);
 
+  // Use the shared ref-counted scroll lock so closing the cart does not
+  // accidentally re-enable scroll if the mobile nav is concurrently open.
   useEffect(() => {
     if (isCartOpen) {
-      document.body.style.overflow = 'hidden';
+      lockScroll();
     } else {
-      document.body.style.overflow = 'unset';
+      unlockScroll();
     }
-
     return () => {
-      document.body.style.overflow = 'unset';
+      unlockScroll();
     };
-  }, [isCartOpen]);
+  }, [isCartOpen, lockScroll, unlockScroll]);
 
   return (
     <>
@@ -126,6 +129,7 @@ export function CartDrawer() {
                       src={item.image}
                       alt={item.name}
                       fill
+                      sizes="80px"
                       className="object-cover"
                     />
                   ) : (

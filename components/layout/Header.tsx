@@ -171,6 +171,8 @@ export default function Header() {
   const [openMobileDropdowns, setOpenMobileDropdowns] = useState<string[]>([]);
   const cartCount = useCartStore((state) => state.totalItems());
   const openCart = useCartStore((state) => state.openCart);
+  const lockScroll = useCartStore((state) => state.lockScroll);
+  const unlockScroll = useCartStore((state) => state.unlockScroll);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -181,17 +183,19 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Lock body scroll when mobile menu is open
+  // Lock body scroll when mobile menu is open.
+  // Uses the shared ref-counted lock so CartDrawer closing does not
+  // prematurely unlock the body if this menu is still open (and vice versa).
   useEffect(() => {
     if (isMobileMenuOpen) {
-      document.body.style.overflow = "hidden";
+      lockScroll();
     } else {
-      document.body.style.overflow = "unset";
+      unlockScroll();
     }
     return () => {
-      document.body.style.overflow = "unset";
+      unlockScroll();
     };
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, lockScroll, unlockScroll]);
 
   const toggleMobileDropdown = (label: string) => {
     setOpenMobileDropdowns((prev) =>

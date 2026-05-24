@@ -45,6 +45,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                   src={selectedImage}
                   alt={product.image?.altText ?? product.name}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 640px"
                   className="object-cover"
                   priority
                 />
@@ -83,6 +84,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                       src={img}
                       alt={`Product thumbnail ${idx + 1}`}
                       fill
+                      sizes="64px"
                       className="object-cover"
                     />
                   </button>

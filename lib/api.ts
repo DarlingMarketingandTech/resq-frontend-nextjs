@@ -16,8 +16,8 @@ type ProductBySlugQueryResult = {
 };
 
 const endpoint = process.env.WP_GRAPHQL_URL;
-const consumerKey = process.env.WC_CONSUMER_KEY;
-const consumerSecret = process.env.WC_CONSUMER_SECRET;
+const consumerKey = process.env.WOOCOMMERCE_CONSUMER_KEY;
+const consumerSecret = process.env.WOOCOMMERCE_CONSUMER_SECRET;
 
 const PRODUCTS_QUERY = /* GraphQL */ `
   query Products {
@@ -105,18 +105,32 @@ async function fetchGraphQL<T>(
 
   const authorization = getAuthorizationHeader();
 
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(authorization ? { Authorization: authorization } : {}),
-    },
-    body: JSON.stringify({ query, variables }),
-    next: {
-      revalidate: 300,
-      tags,
-    },
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15_000);
+
+  let response: Response;
+  try {
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(authorization ? { Authorization: authorization } : {}),
+      },
+      body: JSON.stringify({ query, variables }),
+      signal: controller.signal,
+      next: {
+        revalidate: 300,
+        tags,
+      },
+    });
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error(`WPGraphQL request timed out after 15 s (endpoint: ${endpoint})`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!response.ok) {
     throw new Error(`WPGraphQL request failed with status ${response.status}`);
@@ -133,18 +147,27 @@ async function fetchGraphQL<T>(
 }
 
 const getProductsCached = cache(async (): Promise<Product[]> => {
-  const data = await fetchGraphQL<ProductsQueryResult>(PRODUCTS_QUERY, undefined, ["products"]);
-  return data?.products.nodes ?? [];
+  try {
+    const data = await fetchGraphQL<ProductsQueryResult>(PRODUCTS_QUERY, undefined, ["products"]);
+    return data?.products.nodes ?? [];
+  } catch (err) {
+    console.error("[api] getProductsCached failed:", err instanceof Error ? err.message : err);
+    return [];
+  }
 });
 
 const getProductBySlugCached = cache(async (slug: string): Promise<Product | null> => {
-  const data = await fetchGraphQL<ProductBySlugQueryResult>(
-    PRODUCT_BY_SLUG_QUERY,
-    { slug },
-    ["products", `product:${slug}`],
-  );
-
-  return data?.products.nodes[0] ?? null;
+  try {
+    const data = await fetchGraphQL<ProductBySlugQueryResult>(
+      PRODUCT_BY_SLUG_QUERY,
+      { slug },
+      ["products", `product:${slug}`],
+    );
+    return data?.products.nodes[0] ?? null;
+  } catch (err) {
+    console.error(`[api] getProductBySlugCached("${slug}") failed:`, err instanceof Error ? err.message : err);
+    return null;
+  }
 });
 
 export async function getProducts(): Promise<Product[]> {
